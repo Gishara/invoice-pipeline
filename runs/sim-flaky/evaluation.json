@@ -1,0 +1,156 @@
+{
+ "model": "sim-flaky",
+ "naive_poster": false,
+ "fallback": "sim-fast",
+ "description": "Good model behind an unreliable provider: timeouts, 429s and 5xx",
+ "pools": {
+  "ingest": 3,
+  "extraction": 8,
+  "review": 4,
+  "posting": 2
+ },
+ "completed": true,
+ "invoices": 400,
+ "safety": {
+  "double_payments": 0,
+  "lost_invoices": 0,
+  "unsafe_auto_posts": 0,
+  "wrong_posts_total": 0
+ },
+ "outcomes": {
+  "correct_final_state": 1.0,
+  "auto_post_rate": 0.6575,
+  "review_rate": 0.2925,
+  "unnecessary_review_rate": 0.0871,
+  "defect_catch_rate": 1.0,
+  "defect_caught_for_right_reason": 0.9889,
+  "duplicates_auto_closed": "20/22"
+ },
+ "extraction": {
+  "valid_output_rate": 0.9975,
+  "field_accuracy": {
+   "supplier_name": 1.0,
+   "supplier_tax_id": 0.995,
+   "invoice_number": 0.9674,
+   "invoice_date": 0.9875,
+   "currency": 0.995,
+   "po_number": 1.0,
+   "total": 0.995,
+   "line_items": 0.9749
+  },
+  "repairs": 9
+ },
+ "throughput": {
+  "wall_s": 13.1,
+  "simulated_minutes": 54.6,
+  "invoices_per_simulated_hour": 439.0,
+  "max_concurrent_model_calls": 8,
+  "throttle_wait_s": 0
+ },
+ "caches": {
+  "pdf_text": {
+   "hits": 491,
+   "misses": 399,
+   "hit_rate": 0.552
+  },
+  "reference_data": {
+   "hits": 1126,
+   "misses": 82,
+   "hit_rate": 0.932,
+   "source_reads": 82
+  },
+  "extraction_results_reused": 50,
+  "prompt_cache_tokens": 182742,
+  "prompt_cache_saving_usd": 0.1996
+ },
+ "unnecessary_review_reasons": {
+  "lines_do_not_sum_to_subtotal": 10,
+  "not_grounded": 8,
+  "subtotal_plus_tax_ne_total": 7,
+  "invoice_number_is_an_order_number": 6,
+  "date_out_of_range": 5,
+  "currency_mismatch": 2,
+  "supplier_tax_id_mismatch": 1,
+  "possible_duplicate_conflict_with_invoice_5": 1
+ },
+ "provider": {
+  "calls": 557,
+  "ok": 407,
+  "timeouts": 38,
+  "rate_limited": 87,
+  "server_errors": 25,
+  "failovers": 327,
+  "unavailable": 0,
+  "by_model": {
+   "sim-flaky": 80,
+   "sim-fast": 327
+  },
+  "breaker_trips": {
+   "sim-flaky": 12,
+   "sim-fast": 0
+  }
+ },
+ "cost": {
+  "usd_total": 0.689,
+  "usd_per_invoice": 0.00172,
+  "usd_per_normal_day_20k": 34.0,
+  "usd_per_month_end_day_60k": 103.0,
+  "tokens_per_invoice": 1177,
+  "review_hours_per_normal_day": 146.0,
+  "review_hours_per_month_end_day": 439.0
+ },
+ "resilience": {
+  "kafka_producer_duplicates": 70,
+  "redeliveries_collapsed": 120,
+  "consumer_crashes": 48,
+  "dead_lettered": 1,
+  "worker_crashes": {
+   "extraction:after_model_call": 51,
+   "posting:before_erp_call": 50,
+   "posting:after_erp_call": 26
+  },
+  "resumed_from_checkpoint": 127,
+  "conflicts_between_workers": 0,
+  "erp": {
+   "calls": 328,
+   "timeouts_after_commit": 48,
+   "errors_before_commit": 32,
+   "lookups": 156
+  },
+  "unexpected_errors": []
+ },
+ "by_scenario": {
+  "arithmetic_error": {
+   "REJECTED": 10
+  },
+  "bank_details_changed": {
+   "REJECTED": 10
+  },
+  "clean": {
+   "POSTED (auto)": 263,
+   "POSTED": 25
+  },
+  "dup_conflict": {
+   "REJECTED": 9
+  },
+  "dup_resend": {
+   "DUPLICATE": 22
+  },
+  "items_mismatch": {
+   "REJECTED": 22
+  },
+  "over_limit": {
+   "POSTED": 8
+  },
+  "unknown_supplier": {
+   "REJECTED": 6
+  },
+  "wrong_invoice_no": {
+   "REJECTED": 25
+  }
+ },
+ "wrong_outcomes": [],
+ "wrong_posts": [],
+ "lost": [],
+ "auto_post_limit": 50000.0
+}

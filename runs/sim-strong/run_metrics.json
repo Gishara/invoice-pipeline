@@ -1,0 +1,99 @@
+{
+ "settings": {
+  "model": "sim-strong",
+  "fallback": "sim-fast",
+  "naive_poster": false,
+  "pools": {
+   "ingest": 3,
+   "extraction": 8,
+   "review": 4,
+   "posting": 2
+  },
+  "rpm": 600,
+  "max_in_flight": 64,
+  "partitions": 12,
+  "chaos": {
+   "kafka_producer_dup": 0.15,
+   "consumer_crash_before_commit": 0.1,
+   "worker_crash": 0.1,
+   "erp_timeout_after_commit": 0.15,
+   "erp_error_before_commit": 0.1,
+   "erp_idempotent": false
+  }
+ },
+ "completed": true,
+ "wall_s": 11.6,
+ "simulated_minutes": 48.3,
+ "invoices_per_simulated_hour": 497.0,
+ "extraction_drained_minutes": 27.4,
+ "extraction_per_simulated_hour": 876,
+ "metrics": {
+  "dead_lettered": 1,
+  "extraction_jobs": 746,
+  "redeliveries_collapsed": 120,
+  "consumer_crashes": 48,
+  "reviews_opened": 99,
+  "posting_jobs": 455,
+  "extraction_worker_crashes": 48,
+  "posting_worker_crashes": 79,
+  "reviews_decided": 99,
+  "posting_resumed_from_checkpoint": 79,
+  "extraction_resumed_from_checkpoint": 48
+ },
+ "worker_crashes_by_point": {
+  "extraction:after_model_call": 48,
+  "posting:before_erp_call": 50,
+  "posting:after_erp_call": 29
+ },
+ "producer": {
+  "sent": 402,
+  "duplicates": 70
+ },
+ "erp": {
+  "calls": 328,
+  "timeouts_after_commit": 48,
+  "errors_before_commit": 32,
+  "lookups": 159
+ },
+ "gateway": {
+  "calls": 444,
+  "ok": 406,
+  "timeouts": 7,
+  "rate_limited": 25,
+  "server_errors": 6,
+  "failovers": 0,
+  "unavailable": 0,
+  "tokens_in": 406578,
+  "tokens_cached": 185490,
+  "tokens_out": 62796,
+  "cost_usd": 1.6609,
+  "cost_without_prompt_cache_usd": 2.1617,
+  "throttle_wait_s": 0.0,
+  "max_concurrent": 8,
+  "by_model": {
+   "sim-strong": 406
+  },
+  "latency_p50_s": 9.08,
+  "latency_p95_s": 13.91,
+  "breaker_trips": {
+   "sim-strong": 0,
+   "sim-fast": 0
+  }
+ },
+ "caches": {
+  "pdf_text": {
+   "hits": 299,
+   "misses": 399,
+   "hit_rate": 0.428
+  },
+  "reference_data": {
+   "hits": 1109,
+   "misses": 82,
+   "hit_rate": 0.931,
+   "source_reads": 82
+  },
+  "extraction_results_reused": 47
+ },
+ "extraction_repairs": 9,
+ "unexpected_errors": []
+}

@@ -1,0 +1,102 @@
+{
+ "V001": {
+  "supplier_id": "V001",
+  "name": "Acme Industrial Supplies Ltd",
+  "tax_id": "GB123456789",
+  "currency": "GBP",
+  "iban": "NL97BANK0000007919",
+  "invoice_no_pattern": "ACME-{y}-{n:05d}",
+  "locale": "en",
+  "address": "83 Commerce Road, Unit 10"
+ },
+ "V002": {
+  "supplier_id": "V002",
+  "name": "Brightline Logistics BV",
+  "tax_id": "NL812345678B01",
+  "currency": "EUR",
+  "iban": "NL95BANK0000015838",
+  "invoice_no_pattern": "BL{n:06d}",
+  "locale": "eu",
+  "address": "102 Commerce Road, Unit 4"
+ },
+ "V003": {
+  "supplier_id": "V003",
+  "name": "Ceylon Spice Traders (Pvt) Ltd",
+  "tax_id": "LK114567890",
+  "currency": "USD",
+  "iban": "NL93BANK0000023757",
+  "invoice_no_pattern": "CST/{y}/{n:04d}",
+  "locale": "en",
+  "address": "19 Commerce Road, Unit 35"
+ },
+ "V004": {
+  "supplier_id": "V004",
+  "name": "Delta Office GmbH",
+  "tax_id": "DE298765432",
+  "currency": "EUR",
+  "iban": "NL91BANK0000031676",
+  "invoice_no_pattern": "RE-{n:07d}",
+  "locale": "eu",
+  "address": "25 Commerce Road, Unit 24"
+ },
+ "V005": {
+  "supplier_id": "V005",
+  "name": "Evergreen Packaging Inc",
+  "tax_id": "US941234567",
+  "currency": "USD",
+  "iban": "NL89BANK0000039595",
+  "invoice_no_pattern": "EVP{n:05d}",
+  "locale": "en",
+  "address": "150 Commerce Road, Unit 4"
+ },
+ "V006": {
+  "supplier_id": "V006",
+  "name": "Fjord Components AS",
+  "tax_id": "NO987654321MVA",
+  "currency": "EUR",
+  "iban": "NL87BANK0000047514",
+  "invoice_no_pattern": "FC-{y}{n:04d}",
+  "locale": "eu",
+  "address": "233 Commerce Road, Unit 33"
+ },
+ "V007": {
+  "supplier_id": "V007",
+  "name": "Granite IT Services Ltd",
+  "tax_id": "GB987654321",
+  "currency": "GBP",
+  "iban": "NL85BANK0000055433",
+  "invoice_no_pattern": "GIT-{n:06d}",
+  "locale": "en",
+  "address": "55 Commerce Road, Unit 3"
+ },
+ "V008": {
+  "supplier_id": "V008",
+  "name": "Harbor Freight Partners LLC",
+  "tax_id": "US871234560",
+  "currency": "USD",
+  "iban": "NL83BANK0000063352",
+  "invoice_no_pattern": "HFP-{y}-{n:04d}",
+  "locale": "iso",
+  "address": "23 Commerce Road, Unit 28"
+ },
+ "V009": {
+  "supplier_id": "V009",
+  "name": "Iberia Textiles SL",
+  "tax_id": "ESB12345678",
+  "currency": "EUR",
+  "iban": "NL81BANK0000071271",
+  "invoice_no_pattern": "IT{y}{n:05d}",
+  "locale": "eu",
+  "address": "108 Commerce Road, Unit 5"
+ },
+ "V010": {
+  "supplier_id": "V010",
+  "name": "Jade Electronics Pte Ltd",
+  "tax_id": "SG201912345K",
+  "currency": "USD",
+  "iban": "NL79BANK0000079190",
+  "invoice_no_pattern": "JE{n:06d}",
+  "locale": "en",
+  "address": "62 Commerce Road, Unit 6"
+ }
+}

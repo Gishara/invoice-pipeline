@@ -1,0 +1,50 @@
+{
+  "_comment": "Model registry. Switch with --model / --fallback or INVOICE_MODEL / INVOICE_FALLBACK. Simulated models run offline; real models need an API key and the matching langchain package.",
+  "sim-strong": {
+    "provider": "simulated",
+    "description": "Large, careful model: rare field errors, slower, pricier",
+    "price_in_per_mtok": 3.0, "price_out_per_mtok": 15.0, "latency_s": 9.0,
+    "noise": {"timeout": 0.03, "rate_limit": 0.05, "server_error": 0.01,
+              "bad_json": 0.01, "truncated": 0.005,
+              "field_error": 0.01, "invoice_no_from_po": 0.005, "drop_line": 0.005}
+  },
+  "sim-fast": {
+    "provider": "simulated",
+    "description": "Small, fast model: cheap, more extraction slips",
+    "price_in_per_mtok": 0.8, "price_out_per_mtok": 4.0, "latency_s": 3.0,
+    "noise": {"timeout": 0.02, "rate_limit": 0.08, "server_error": 0.01,
+              "bad_json": 0.04, "truncated": 0.01,
+              "field_error": 0.05, "invoice_no_from_po": 0.03, "drop_line": 0.03}
+  },
+  "sim-weak": {
+    "provider": "simulated",
+    "description": "Weak model: frequent bad JSON and invented fields",
+    "price_in_per_mtok": 0.25, "price_out_per_mtok": 1.25, "latency_s": 2.0,
+    "noise": {"timeout": 0.02, "rate_limit": 0.05, "server_error": 0.02,
+              "bad_json": 0.12, "truncated": 0.03,
+              "field_error": 0.14, "invoice_no_from_po": 0.08, "drop_line": 0.08}
+  },
+  "sim-flaky": {
+    "provider": "simulated",
+    "description": "Good model behind an unreliable provider: timeouts, 429s and 5xx",
+    "price_in_per_mtok": 3.0, "price_out_per_mtok": 15.0, "latency_s": 9.0,
+    "noise": {"timeout": 0.20, "rate_limit": 0.30, "server_error": 0.10,
+              "bad_json": 0.01, "truncated": 0.005,
+              "field_error": 0.01, "invoice_no_from_po": 0.005, "drop_line": 0.005}
+  },
+  "claude-sonnet": {
+    "provider": "anthropic", "model_id": "claude-sonnet-5-5",
+    "description": "Real Claude model via langchain-anthropic (needs ANTHROPIC_API_KEY)",
+    "price_in_per_mtok": 3.0, "price_out_per_mtok": 15.0
+  },
+  "claude-haiku": {
+    "provider": "anthropic", "model_id": "claude-haiku-5-5",
+    "description": "Real Claude model via langchain-anthropic (needs ANTHROPIC_API_KEY)",
+    "price_in_per_mtok": 1.0, "price_out_per_mtok": 5.0
+  },
+  "openai-mini": {
+    "provider": "openai", "model_id": "gpt-4o-mini",
+    "description": "Real OpenAI model via langchain-openai (needs OPENAI_API_KEY)",
+    "price_in_per_mtok": 0.15, "price_out_per_mtok": 0.6
+  }
+}
