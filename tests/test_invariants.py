@@ -131,3 +131,59 @@ def test_copy_with_different_amount_waits_for_the_original_under_review():
          "lines": [{"sku": "S", "description": "d", "quantity": 1, "unit_price": 10.0, "line_total": 10.0}]}
     v = ValidationService(Repo(), Ref(), Policy()).evaluate(2, f, [])
     assert v.outcome == "review" and any("under_review" in r for r in v.reasons)
+
+
+def test_concurrent_posting_attempts_reserve_the_outbox_once(tmp_path: Path):
+    """A second worker must not call the ERP while the first attempt is still in flight."""
+    import json
+
+    from app.services.posting import PostingService
+
+    class NoCrash:
+        def maybe_crash(self, point): pass
+
+    class BlockingErp:
+        def __init__(self):
+            self.entered, self.release = threading.Event(), threading.Event()
+            self.calls = 0
+
+        def post(self, external_ref, payload):
+            self.calls += 1
+            self.entered.set()
+            assert self.release.wait(5)
+            return "ERP-0000001"
+
+        def lookup(self, external_ref): return None
+
+    clock = ScaledClock(1.0)
+    repo = SqliteInvoiceRepository(tmp_path / "posting.db", clock)
+    fields = {"invoice_number": "INV-1", "invoice_date": "2026-11-01", "currency": "USD",
+              "total": 10.0, "po_number": "PO-1", "lines": []}
+    repo.insert_received("sha", "pdf", Record("topic", 0, 0, "sender", b"pdf"))
+    repo.transition(1, {"RECEIVED"}, "VALIDATED", "test", supplier_id="V001",
+                     invoice_no_norm="INV1", fields_json=json.dumps(fields))
+    erp = BlockingErp()
+    poster = PostingService(repo, erp, NoCrash(), clock)
+    result, errors = [], []
+
+    def first_attempt():
+        try:
+            result.append(poster.post(1))
+        except Exception as exc:
+            errors.append(exc)
+
+    worker = threading.Thread(target=first_attempt)
+    worker.start()
+    try:
+        assert erp.entered.wait(5)
+        assert poster.post(1) == "POSTING"
+        assert erp.calls == 1
+    finally:
+        erp.release.set()
+        worker.join(5)
+
+    assert not worker.is_alive()
+    assert not errors
+    assert result == ["POSTED"]
+    assert repo.get(1)["state"] == "POSTED"
+    assert erp.calls == 1

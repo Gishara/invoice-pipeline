@@ -46,7 +46,8 @@ CREATE TABLE IF NOT EXISTS extraction_cache(
 
 CREATE TABLE IF NOT EXISTS erp_outbox(
   invoice_id INT PRIMARY KEY, idempotency_key TEXT NOT NULL UNIQUE,
-  payload TEXT NOT NULL, status TEXT NOT NULL, attempts INT NOT NULL DEFAULT 0, erp_doc_id TEXT);
+    payload TEXT NOT NULL, status TEXT NOT NULL, attempts INT NOT NULL DEFAULT 0, erp_doc_id TEXT,
+    lease_until REAL NOT NULL DEFAULT 0);
 
 CREATE TABLE IF NOT EXISTS review_task(
   invoice_id INT PRIMARY KEY, reasons_json TEXT, fields_json TEXT, status TEXT,
@@ -70,6 +71,9 @@ class SqliteInvoiceRepository:
         self.path, self.clock = str(path), clock
         self._local = threading.local()
         self._db().executescript(SCHEMA)
+        columns = {row[1] for row in self._db().execute("PRAGMA table_info(erp_outbox)")}
+        if "lease_until" not in columns:
+            self._db().execute("ALTER TABLE erp_outbox ADD COLUMN lease_until REAL NOT NULL DEFAULT 0")
 
     # ------------------------------------------------------------ plumbing
     def _db(self) -> sqlite3.Connection:
@@ -210,11 +214,17 @@ class SqliteInvoiceRepository:
         r = self._db().execute("SELECT * FROM erp_outbox WHERE invoice_id=?", (inv_id,)).fetchone()
         return dict(r) if r else None
 
-    def outbox_mark_sending(self, inv_id: int) -> None:
-        self._db().execute("UPDATE erp_outbox SET status='SENDING', attempts=attempts+1 WHERE invoice_id=?", (inv_id,))
+    def outbox_claim(self, inv_id: int, lease_s: float, now: float) -> Optional[int]:
+        """Atomically reserve one ERP attempt; return its 1-based attempt number, or None if busy."""
+        row = self._db().execute(
+            "UPDATE erp_outbox SET status='SENDING', attempts=attempts+1, lease_until=? "
+            "WHERE invoice_id=? AND lease_until<=? RETURNING attempts",
+            (now + lease_s, inv_id, now)).fetchone()
+        return row[0] if row else None
 
     def outbox_done(self, inv_id: int, erp_doc_id: str) -> None:
-        self._db().execute("UPDATE erp_outbox SET status='DONE', erp_doc_id=? WHERE invoice_id=?", (erp_doc_id, inv_id))
+        self._db().execute("UPDATE erp_outbox SET status='DONE', erp_doc_id=?, lease_until=0 WHERE invoice_id=?",
+                           (erp_doc_id, inv_id))
 
     # ------------------------------------------------------------ review
     def open_review(self, inv_id: int, reasons: list[str], fields: Optional[dict]) -> None:

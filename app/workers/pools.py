@@ -138,7 +138,10 @@ class ReviewWorker(Worker):
             self.clock.sleep(self.think_s)
             decision = self.policy.decide(row, json.loads(task["reasons_json"] or "[]"))
             decision["reviewer"] = self.name
-            self.graph.invoke(Command(resume=decision), {"configurable": {"thread_id": row["graph_thread"]}})
+            try:
+                self.graph.invoke(Command(resume=decision), {"configurable": {"thread_id": row["graph_thread"]}})
+            except Conflict:
+                self.metrics.inc("review_conflicts")  # another reviewer completed the decision first
             self.metrics.inc("reviews_decided")
             return True
         row = self.repo.claim(("NEEDS_REVIEW",), self.name, self.lease_s, self.clock.now())

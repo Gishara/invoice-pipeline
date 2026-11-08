@@ -13,9 +13,10 @@ from app.ports import (Conflict, CrashInjector, DuplicateBusinessKey, ErpClient,
 
 class PostingService:
     def __init__(self, repo: InvoiceRepository, erp: ErpClient, crash: CrashInjector, clock,
-                 naive: bool = False, settle_s: float = 60.0):
+                 naive: bool = False, settle_s: float = 60.0, claim_lease_s: float = 120.0):
         self.repo, self.erp, self.crash, self.clock, self.naive = repo, erp, crash, clock, naive
         self.settle_s = settle_s  # give the ERP time to make a slow post visible before we look it up
+        self.claim_lease_s = max(claim_lease_s, settle_s)
 
     def post(self, inv_id: int, actor: str = "poster") -> str:
         row = self.repo.get(inv_id)
@@ -38,7 +39,12 @@ class PostingService:
             return row["state"]
         ob = self.repo.outbox(inv_id)
         key, payload = ob["idempotency_key"], json.loads(ob["payload"])
-        uncertain = ob["attempts"] > 0 or row["state"] == "POST_UNKNOWN"
+        attempt = self.repo.outbox_claim(inv_id, self.claim_lease_s, self.clock.now())
+        if attempt is None:
+            return self.repo.get(inv_id)["state"]
+        # Use the attempt number returned by the atomic claim, not the earlier read:
+        # another worker may have completed an ERP call between those two operations.
+        uncertain = attempt > 1 or row["state"] == "POST_UNKNOWN"
         if uncertain and not self.naive:
             found = self.erp.lookup(key)
             if found:
@@ -46,7 +52,6 @@ class PostingService:
         if row["state"] == "POST_UNKNOWN":
             self.repo.transition(inv_id, {"POST_UNKNOWN"}, "POSTING", actor,
                                  "naive blind retry" if self.naive else "confirmed absent in ERP")
-        self.repo.outbox_mark_sending(inv_id)       # recorded BEFORE the call: a crash now means "uncertain"
         self.crash.maybe_crash("posting:before_erp_call")
         try:
             doc = self.erp.post(key, payload)
